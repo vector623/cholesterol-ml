@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import {ollamaOCR, DEFAULT_OCR_SYSTEM_PROMPT, LlamaOCRConfig} from "ollama-ocr";
 import pLimit from 'p-limit';
+import {OcrResult} from "./data_repo";
 
 async function runOCR(filePath: string): Promise<string> {
     const config: LlamaOCRConfig = {
@@ -26,8 +27,8 @@ console.log(process.cwd());
     const resultsPromises = files
         .map(async file => {
             return await limit(async () => {
-                let result: any = {
-                    image: file,
+                let result: OcrResult = {
+                    filename: file,
                     text: await runOCR(file)
                 };
                 return result;
