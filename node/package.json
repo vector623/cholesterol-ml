@@ -1,12 +1,13 @@
 {
   "main": "src/index.js",
   "dependencies": {
-    "ollama-ocr": "^0.0.2"
+    "ollama-ocr": "^0.0.2",
+    "p-limit": "^6.2.0"
   },
   "devDependencies": {
-    "typescript": "^5.7.3",
     "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0"
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.7.3"
   },
   "scripts": {
     "build": "tsc",
