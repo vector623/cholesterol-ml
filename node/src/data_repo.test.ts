@@ -1,39 +1,20 @@
-import {OcrResult, ocrResults, saveToJSON} from './data_repo';
-import {pipe} from 'fp-ts/lib/function';
-import {fold} from "fp-ts/Either";
-import * as TE from 'fp-ts/lib/TaskEither';
+import {OcrResult, saveToJSON} from './data_repo';
+import {TaskEither} from 'fp-ts/lib/TaskEither';
+import {right} from "fp-ts/lib/Either";
 
-
-describe('Data repository operations', () => {
-    it('should log "Operation completed" on successful resolution', async () => {
+describe('repo operations', () => {
+    it('saveToJSON should report with ', async () => {
         let data: OcrResult[] = [];
-        let outcome = pipe(
-            saveToJSON(data, 'items.json'),
-            TE.fold(
-                (err) => {
-                    console.error('Failed to save JSON:', err.message);
-                    return (): Promise<void> => Promise.resolve(); // or handle the error appropriately
-                },
-                () => {
-                    console.log('JSON file has been saved successfully.');
-                    return (): Promise<void> => Promise.resolve(); // or perform another action
-                }
-            )
-        )();
-
-        const logSpy = jest.spyOn(console, 'log').mockImplementation();
-        await expect(outcome).resolves.toBeUndefined(); // Ensure the Promise resolves
-        expect(logSpy).toHaveBeenCalledWith('JSON file has been saved successfully.'); // Assert the logged output
-
-        // Cleanup
-        logSpy.mockRestore();
+        let saveResult: TaskEither<Error, void> = saveToJSON(data, 'data.json');
+        const outcome = await saveResult();
+        expect(outcome).toEqual(right(undefined));
     });
 
-    // outcome.then(() => {
-    //     // This block will run after the TaskEither has completed
-    //     console.log('Operation completed');
-    // }).catch((error) => {
-    //     console.error('Unexpected error:', error);
-    // });
+    it('should log "Operation completed" on successful resolution', async () => {
+        const logSpy = jest.spyOn(console, 'log').mockImplementation();
+        console.log('Operation completed');
+        expect(logSpy).toHaveBeenCalledWith('Operation completed');
+        logSpy.mockRestore();
+    });
 })
 
