@@ -1,20 +1,31 @@
-import {OcrResult, saveToJSON} from './data_repo';
+import {loadFromJSON, OcrResult, saveToJSON} from './data_repo';
 import {TaskEither} from 'fp-ts/lib/TaskEither';
 import {right} from "fp-ts/lib/Either";
+import * as fs from "node:fs";
+
 
 describe('repo operations', () => {
-    it('saveToJSON should report with ', async () => {
-        let data: OcrResult[] = [];
-        let saveResult: TaskEither<Error, void> = saveToJSON(data, 'data.json');
-        const outcome = await saveResult();
-        expect(outcome).toEqual(right(undefined));
+    it('saveToJSON should succeed with empty set', async () => {
+        const testDataFile = 'test_save_data.json';
+        const data: OcrResult[] = [];
+        const saveResult = await saveToJSON(data, testDataFile)();
+
+        expect(saveResult).toEqual(right(undefined)); // void is represented as undefined
+
+        fs.unlinkSync(testDataFile);
     });
 
-    it('should log "Operation completed" on successful resolution', async () => {
-        const logSpy = jest.spyOn(console, 'log').mockImplementation();
-        console.log('Operation completed');
-        expect(logSpy).toHaveBeenCalledWith('Operation completed');
-        logSpy.mockRestore();
+    it('saveToJSON should succeed with empty set', async () => {
+        const loadResult = await loadFromJSON('test_load_data.json')();
+
+        expect(loadResult).toEqual(right(undefined)); // void is represented as undefined
     });
+
+    // it('should log "Operation completed" on successful resolution', async () => {
+    //     const logSpy = jest.spyOn(console, 'log').mockImplementation();
+    //     console.log('Operation completed');
+    //     expect(logSpy).toHaveBeenCalledWith('Operation completed');
+    //     logSpy.mockRestore();
+    // });
 })
 
