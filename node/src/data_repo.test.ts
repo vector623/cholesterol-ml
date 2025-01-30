@@ -3,7 +3,6 @@ import {TaskEither} from 'fp-ts/lib/TaskEither';
 import {right} from "fp-ts/lib/Either";
 import * as fs from "node:fs";
 
-
 describe('repo operations', () => {
     it('saveToJSON should succeed with empty set', async () => {
         const testDataFile = 'test_save_data.json';
