@@ -2,7 +2,6 @@ import {TaskEither, tryCatch} from 'fp-ts/lib/TaskEither'
 import {writeFile} from 'fs/promises';
 import * as fs from "node:fs";
 
-
 export interface OcrResult {
     text: string;
     filename: string;
