@@ -31,5 +31,105 @@
         }
       ]
     }
+  },
+  {
+    "filename": "IMG_4561.JPEG",
+    "text": {
+      "device": {
+        "brand": "CardioChek",
+        "model": "Plus"
+      },
+      "results": [
+        {
+          "test_type": "+GLU+LIPIDS",
+          "reference_id": "Q218"
+        },
+        {
+          "test_type": "CALC LDL",
+          "value": "88 mg/dl"
+        },
+        {
+          "test_type": "TC/HDL",
+          "value": "3.0"
+        },
+        {
+          "test_type": "LDL/HDL",
+          "value": "1.7"
+        },
+        {
+          "test_type": "NON-HDL",
+          "value": "102 mg/dl"
+        }
+      ],
+      "timestamp": [
+        "01:02 PM",
+        "10/26/2009"
+      ]
+    }
+  },
+  {
+    "filename": "IMG_4566.JPEG",
+    "text": {
+      "device": {
+        "brand": "CardioChek",
+        "model": "Plus"
+      },
+      "test_results": [
+        {
+          "glucose": "151 mg/dL"
+        },
+        {
+          "lipids": null,
+          "total_cholesterol": "40 mg/dL",
+          "high_density_cholesterol": "63 mg/dL",
+          "triglycerides": "63 mg/dL"
+        }
+      ],
+      "test_number": "Q218",
+      "time_taken": [
+        {
+          "date_taken": "10/47/2009",
+          "time_taken": "11:54 AM"
+        },
+        {
+          "date_taken": "10/17/2009"
+        }
+      ]
+    }
+  },
+  {
+    "filename": "IMG_4567.JPEG",
+    "text": {
+      "device": {
+        "name": "CardioChek Plus",
+        "brand": "CardioChek"
+      },
+      "date_time": [
+        "10/17/2019",
+        "11:54 AM"
+      ],
+      "results": [
+        {
+          "test_type": "eGLU+LIPIDS",
+          "id": "Q218"
+        },
+        {
+          "test_result": "CALC LDL",
+          "value": "98 mg/dL"
+        },
+        {
+          "test_result": "TC/HDL",
+          "value": "3.8"
+        },
+        {
+          "test_result": "LDL/HDL",
+          "value": "2.5"
+        },
+        {
+          "test_result": "NON-HDL",
+          "value": "111 mg/dl"
+        }
+      ]
+    }
   }
 ]
