@@ -14,3 +14,7 @@ data/cholesterol-data:
 
 ollama-test:
 	OLLAMA_HOST='http://dgp5000:11434' ollama run llama2 "Hello"
+
+clean:
+	 rm -rf dist/
+	 rm -rf build/

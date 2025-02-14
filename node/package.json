@@ -17,6 +17,9 @@
     "build": "tsc",
     "start": "ts-node src/main.ts",
     "dev": "ts-node-dev --respawn src/main.ts",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "clean": "rm -rf dist/ node_modules/ package-lock.json",
+    "clean:dist": "rm -rf dist/",
+    "clean:full": "npm run clean && npm cache clean --force"
   }
 }
