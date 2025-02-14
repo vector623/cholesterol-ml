@@ -18,3 +18,6 @@ ollama-test:
 clean:
 	 rm -rf dist/
 	 rm -rf build/
+
+htop:
+	ssh -t davidg@dgp5000 "TERM=xterm-256color htop"

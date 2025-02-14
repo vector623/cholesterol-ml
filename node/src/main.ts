@@ -1,8 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import pLimit from 'p-limit';
-import {OcrResult} from "./data_repo";
+import {OcrResult, saveToJSON} from "./data_repo";
 import {askOllama} from "./data_factory";
+import {pipe} from 'fp-ts/function'
+import * as TE from 'fp-ts/TaskEither'
 
 (async () => {
     const dataDir = "/home/davidg/gits/cholesterol-ml/node/data/cholesterol-data/";
@@ -22,19 +24,19 @@ import {askOllama} from "./data_factory";
             });
         });
     const results = await Promise.all(resultsPromises);
-    // let outcome = pipe(
-    //     saveToJSON(results, 'data.json'),
-    //     TE.fold(
-    //         (err) => {
-    //             console.error('Failed to save JSON:', err.message);
-    //             return (): Promise<void> => Promise.resolve(); // or handle the error appropriately
-    //         },
-    //         () => {
-    //             console.log('JSON file has been saved successfully.');
-    //             return (): Promise<void> => Promise.resolve(); // or perform another action
-    //         }
-    //     )
-    // )();
+    let outcome = pipe(
+        saveToJSON(results, 'data.json'),
+        TE.fold(
+            (err) => {
+                console.error('Failed to save JSON:', err.message);
+                return (): Promise<void> => Promise.resolve(); // or handle the error appropriately
+            },
+            () => {
+                console.log('JSON file has been saved successfully.');
+                return (): Promise<void> => Promise.resolve(); // or perform another action
+            }
+        )
+    )();
 
     console.log(results);
 })();

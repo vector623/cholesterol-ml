@@ -13,7 +13,10 @@ export const addOcrResult: (result: OcrResult) => OcrResult[] = (result: OcrResu
     return [...ocrResults, result];
 }
 
-export const saveToJSON: (items: OcrResult[], filename: string) => TaskEither<Error, void> = (items: OcrResult[], filename: string): TaskEither<Error, void> =>
+export const saveToJSON: (
+    items: OcrResult[],
+    filename: string) =>
+    TaskEither<Error, void> = (items: OcrResult[], filename: string): TaskEither<Error, void> =>
     tryCatch(
         (): Promise<void> => writeFile(filename, JSON.stringify(items, null, 2)),
         (reason: unknown) => new Error(String(reason))
