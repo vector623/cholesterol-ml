@@ -3,5 +3,5 @@ export const prompt = `Please look at this image and extract all the text conten
     - Use appropriate keys for different text elements
     - Maintain the hierarchical structure of the content
     - Include all visible text from the image
-    Provide only the json without any additional comments.
+    Provide only the json without any additional comments. Downcase all json fieldnames.
     `;

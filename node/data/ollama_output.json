@@ -1,0 +1,35 @@
+[
+  {
+    "filename": "IMG_4560.JPEG",
+    "text": {
+      "device": {
+        "name": "CardioChek®Plus",
+        "version": "Q218"
+      },
+      "metrics": [
+        {
+          "type": "CHOL",
+          "value": "154 mg/dL"
+        },
+        {
+          "type": "HDL CHOL",
+          "value": "52 mg/dL"
+        },
+        {
+          "type": "TRIG",
+          "value": "69 mg/dL"
+        },
+        {
+          "type": "eGLU",
+          "value": "109 mg/dL"
+        }
+      ],
+      "timestamp": [
+        {
+          "date_time": "01:02 PM",
+          "date": "10/26/2009"
+        }
+      ]
+    }
+  }
+]

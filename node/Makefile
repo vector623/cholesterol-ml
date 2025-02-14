@@ -19,5 +19,10 @@ clean:
 	 rm -rf dist/
 	 rm -rf build/
 
-htop:
-	ssh -t davidg@dgp5000 "TERM=xterm-256color htop"
+monitor:
+	ssh -t davidg@dgp5000 'TERM=xterm-256color \
+		tmux new-session \; \
+			split-window -v \; \
+			send-keys "btop" C-m \; \
+			select-pane -t 0 \; \
+			send-keys "nvtop" C-m'

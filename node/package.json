@@ -2,7 +2,6 @@
   "main": "src/index.js",
   "dependencies": {
     "fp-ts": "^2.16.9",
-    "ollama-ocr": "^0.0.2",
     "p-limit": "^6.2.0"
   },
   "devDependencies": {
