@@ -1,56 +1,95 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {ollamaOCR, DEFAULT_OCR_SYSTEM_PROMPT, LlamaOCRConfig} from "ollama-ocr";
-import pLimit from 'p-limit';
-import {OcrResult, saveToJSON} from "./data_repo";
-import {prompts} from "./prompts";
-import {pipe} from "fp-ts/function";
-import * as TE from "fp-ts/TaskEither";
+import * as TE from 'fp-ts/TaskEither'
+import {pipe} from 'fp-ts/function'
+import {loadFromJSON, OcrResult, saveToJSON} from "./data_repo";
+import {askOllamaTE} from './ollama';
 
-async function runOCR(filePath: string): Promise<string> {
-    const config: LlamaOCRConfig = {
-        model: "minicpm-v",
-        filePath: filePath,
-        // systemPrompt: DEFAULT_OCR_SYSTEM_PROMPT,
-        systemPrompt: prompts.jsonv2,
-    };
-    const text = await ollamaOCR(config);
-    return text;
+interface PipeState {
+    processedData: OcrResult[];
+    processedFiles: string[];
+    toBeProcessedFiles: string[];
+    toBeProcessedFilesSubset: string[];
+    newData: OcrResult[];
 }
 
-console.log(prompts.jsonv2);
-
 (async () => {
-    const dataDir = "/home/davidg/gits/cholesterol-ml/data/iCloud Photos/";
-    const files = fs.readdirSync(dataDir)
-        .slice(0, 1)
-        .map(file => path.join(dataDir, file));
+    const dataDir = "/home/davidg/gits/cholesterol-ml/node/data/cholesterol-data/";
 
-    const limit = pLimit(1);
-    const resultsPromises = files
-        .map(async file => {
-            return await limit(async () => {
-                let result: OcrResult = {
+    const incomingFiles = await pipe(
+        TE.tryCatch(
+            async () => fs.promises.readdir(dataDir),
+            reason => new Error(String(reason)) as never,
+        ),
+        TE.chain(files =>
+            TE.traverseArray((file: string) =>
+                TE.of({
                     filename: file,
-                    text: await runOCR(file)
-                };
-                return result;
-            });
-        });
-    const results = await Promise.all(resultsPromises);
-    let outcome = pipe(
-        saveToJSON(results, 'data.json'),
+                    fullPath: path.join(dataDir, file)
+                })
+            )(files)
+        ),
         TE.fold(
-            (err) => {
-                console.error('Failed to save JSON:', err.message);
-                return (): Promise<void> => Promise.resolve(); // or handle the error appropriately
-            },
-            () => {
-                console.log('JSON file has been saved successfully.');
-                return (): Promise<void> => Promise.resolve(); // or perform another action
-            }
-        )
+            () => async () => [],
+            data => async () => data,
+        ),
     )();
 
-    console.log(results);
+    const processFiles = pipe(
+        loadFromJSON('./data/ollama_output.json'),
+        TE.map(results => {
+            return {
+                processedData: results,
+                processedFiles: results.map(result => result.filename)
+            }
+        }),
+        TE.map(state => {
+            return {
+                ...state,
+                toBeProcessedFiles: incomingFiles
+                    .filter(file => !state.processedFiles.includes(file.filename)),
+            };
+        }),
+        TE.map(state => {
+            return {
+                ...state,
+                toBeProcessedFilesSubset: state.toBeProcessedFiles.slice(0, 1)
+            };
+        }),
+        TE.chain(state =>
+            pipe(
+                state.toBeProcessedFilesSubset,
+                TE.traverseArray(file =>
+                    pipe(
+                        askOllamaTE(file.fullPath),
+                        TE.map(response => ({
+                            filename: file.filename,
+                            text: JSON.parse(response)
+                        }))
+                    ),
+                ),
+                TE.map(newData => ({...state, newData}))
+            )
+        ),
+        TE.chain((state) => TE.tryCatch(
+            async () => {
+                const resolvedResults = await Promise.all(state.newData);
+                const combinedResults = [...state.processedData, ...resolvedResults];
+                return await saveToJSON(combinedResults, 'data/ollama_output.json')();
+            },
+            (err) => new Error(String(err))
+        )),
+    );
+
+    try {
+        const result = await processFiles();
+        if (result._tag === 'Left') {
+            console.error('Error:', result.left);
+            process.exit(1);
+        }
+        console.log('Success:', result.right);
+    } catch (error) {
+        console.error('Caught error:', error);
+        process.exit(1);
+    }
 })();
