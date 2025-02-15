@@ -2,10 +2,10 @@ import * as fs from 'fs';
 import * as path from 'path';
 import pLimit from 'p-limit';
 import {loadFromJSON, OcrResult, saveToJSON} from "./data_repo";
-import {askOllama} from "./data_factory";
 import {pipe} from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
-import { askOllamaTE } from './ollama';
+import {askOllamaTE} from './ollama';
+import {cons} from "fp-ts/Array";
 
 interface PipeState {
     processedData: OcrResult[];
@@ -18,17 +18,26 @@ interface PipeState {
 (async () => {
     const dataDir = "/home/davidg/gits/cholesterol-ml/node/data/cholesterol-data/";
     const ollamaLimit = pLimit(1);
-    //TODO: add this to pipe
-    const files = fs.readdirSync(dataDir)
-        .map(file => {
-            return {
-                filename: file,
-                fullPath: path.join(dataDir, file)
-            };
-        });
+    const incomingFiles = await pipe(
+        TE.tryCatch(
+            async () => fs.promises.readdir(dataDir),
+            reason => new Error(String(reason)) as never,
+        ),
+        TE.chain(files =>
+            TE.traverseArray((file: string) =>
+                TE.of({
+                    filename: file,
+                    fullPath: path.join(dataDir, file)
+                })
+            )(files)
+        ),
+        TE.fold(
+            error => async () => [] as { filename: string, fullPath: string }[],
+            data => async () => data,
+        ),
+    )();
 
     const processFiles = pipe(
-        //TODO: setup an object to carry state
         loadFromJSON('./data/ollama_output.json'),
         TE.map(results => {
             return {
@@ -39,11 +48,11 @@ interface PipeState {
         TE.map(state => {
             return {
                 ...state,
-                toBeProcessedFiles: files.filter(file => !state.processedFiles.includes(file.filename)),
+                toBeProcessedFiles: incomingFiles
+                    .filter(file => !state.processedFiles.includes(file.filename)),
             };
         }),
         TE.map(state => {
-            //return files.slice(0, 1);
             return {
                 ...state,
                 toBeProcessedFilesSubset: state.toBeProcessedFiles.slice(0, 1)
@@ -61,14 +70,13 @@ interface PipeState {
                         }))
                     ),
                 ),
-                TE.map(newData => ({ ...state, newData }))
+                TE.map(newData => ({...state, newData}))
             )
         ),
         TE.chain((state) => TE.tryCatch(
             async () => {
                 const resolvedResults = await Promise.all(state.newData);
                 const combinedResults = [...state.processedData, ...resolvedResults];
-                //TODO: combine resolvedResults with processedData before saving
                 return await saveToJSON(combinedResults, 'data/ollama_output.json')();
             },
             (err) => new Error(String(err))
