@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as TE from 'fp-ts/TaskEither'
 import {pipe} from 'fp-ts/function'
 import {loadFromJSON, OcrResult, saveToJSON} from "./data_repo";
-import {askOllamaTE} from './ollama';
+import {askOllamaTE} from './data_factory';
 
 interface PipeState {
     processedData: OcrResult[];
@@ -64,32 +64,33 @@ interface PipeState {
                         askOllamaTE(file.fullPath),
                         TE.map(response => ({
                             filename: file.filename,
-                            text: JSON.parse(response)
+                            //text: JSON.parse(response)
+                            text: response
                         }))
                     ),
                 ),
                 TE.map(newData => ({...state, newData}))
             )
         ),
-        TE.chain((state) => TE.tryCatch(
-            async () => {
-                const resolvedResults = await Promise.all(state.newData);
-                const combinedResults = [...state.processedData, ...resolvedResults];
-                return await saveToJSON(combinedResults, 'data/ollama_output.json')();
-            },
-            (err) => new Error(String(err))
-        )),
-    );
+        TE.map(state => {
+            return {
+                ...state,
+                combinedFiles: [...state.processedData, ...state.newData]
+            };
+        }),
 
-    try {
-        const result = await processFiles();
-        if (result._tag === 'Left') {
-            console.error('Error:', result.left);
-            process.exit(1);
-        }
-        console.log('Success:', result.right);
-    } catch (error) {
-        console.error('Caught error:', error);
-        process.exit(1);
-    }
+        TE.chain((state) =>
+            saveToJSON(state.combinedFiles, 'data/ollama_output.json')
+        ),
+        TE.fold(
+            () => async () => {
+                console.error('Failed to save JSON');
+            },
+            (state) => async () => {
+                console.log('JSON file has been saved successfully.');
+                // TODO: refactor to make state variable available here
+                // console.log(state);
+            },
+        ),
+    )();
 })();

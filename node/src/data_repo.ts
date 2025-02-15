@@ -7,10 +7,22 @@ export interface OcrResult {
     filename: any;
 }
 
+//TODO: implement and start using this
+type OcrResultRepository = {
+    addOcrResult: (result: OcrResult) => OcrResult[];
+    addOcrResults: (results: OcrResult[]) => OcrResult[];
+    saveToJSON: (items: OcrResult[], filename: string) => TaskEither<Error, void>;
+    loadFromJSON: (filename: string) => TaskEither<Error, OcrResult[]>;
+}
+
 export const ocrResults: OcrResult[] = [];
 
 export const addOcrResult: (result: OcrResult) => OcrResult[] = (result: OcrResult) => {
     return [...ocrResults, result];
+}
+
+export const addOcrResults: (results: OcrResult[]) => OcrResult[] = (results: OcrResult[]) => {
+    return [...ocrResults, ...results];
 }
 
 export const saveToJSON: (items: OcrResult[], filename: string)
