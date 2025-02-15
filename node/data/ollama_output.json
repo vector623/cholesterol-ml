@@ -131,5 +131,44 @@
         }
       ]
     }
+  },
+  {
+    "filename": "IMG_4568.JPEG",
+    "text": {
+      "Device": {
+        "Brand": "CardioChek",
+        "Model": "Plus"
+      },
+      "Results": [
+        {
+          "Label": "+GLU+LIPIDS",
+          "Value": "Q218 mg/dl"
+        },
+        {
+          "Label": "CHOL",
+          "Value": "125 mg/dl"
+        },
+        {
+          "Label": "HDL CHOL",
+          "Value": "53 mg/dl"
+        },
+        {
+          "Label": "TRIG",
+          "Value": "84 mg/dl"
+        },
+        {
+          "Label": "+GLU",
+          "Value": "109 mg/dl"
+        }
+      ],
+      "Timestamp": [
+        {
+          "Time": "2:59 PM"
+        },
+        {
+          "Date": "10/11/2009"
+        }
+      ]
+    }
   }
 ]

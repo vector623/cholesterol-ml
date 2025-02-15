@@ -1,11 +1,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import pLimit from 'p-limit';
-import {loadFromJSON, OcrResult, saveToJSON} from "./data_repo";
-import {pipe} from 'fp-ts/function'
 import * as TE from 'fp-ts/TaskEither'
+import {pipe} from 'fp-ts/function'
+import {loadFromJSON, OcrResult, saveToJSON} from "./data_repo";
 import {askOllamaTE} from './ollama';
-import {cons} from "fp-ts/Array";
 
 interface PipeState {
     processedData: OcrResult[];
@@ -17,7 +15,7 @@ interface PipeState {
 
 (async () => {
     const dataDir = "/home/davidg/gits/cholesterol-ml/node/data/cholesterol-data/";
-    const ollamaLimit = pLimit(1);
+
     const incomingFiles = await pipe(
         TE.tryCatch(
             async () => fs.promises.readdir(dataDir),
@@ -32,7 +30,7 @@ interface PipeState {
             )(files)
         ),
         TE.fold(
-            error => async () => [] as { filename: string, fullPath: string }[],
+            () => async () => [],
             data => async () => data,
         ),
     )();
